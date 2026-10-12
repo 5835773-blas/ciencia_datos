@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 
-def parsefecha(texto):
+def parse_fecha(texto):
     """Convierte 'MM/DD/YYYY' en un objeto date."""
     return datetime.strptime(texto, "%m/%d/%Y").date()
 
