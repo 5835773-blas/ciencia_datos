@@ -1,8 +1,8 @@
 # Informe U1: mi primer aporte reproducible
 
 **Nombre:** Jesús López
-**Usuario de GitHub:** jelosoft
-**Nombre de carpeta en entregas:** jlopez
+**Usuario de GitHub:** Jelosoft-dev
+**Nombre de carpeta en entregas:** Jelosoft-dev
 **Fecha:** 14/10/2026
 
 ## Entorno
@@ -30,7 +30,7 @@ Lo que hace reproducible este entorno es el archivo `uv.lock`. Allí quedan fija
 
 ## Flujo de Git
 
-Trabajé en la rama `u1/jlopez`, creada desde `main`, y solo modifiqué archivos dentro de mi carpeta de entrega. Separé el trabajo en commits pequeños para que cada uno tuviera un único propósito y se pudiera revisar o revertir por separado.
+Trabajé en la rama `u1/Jelosoft-dev`, creada desde `main`, y solo modifiqué archivos dentro de mi carpeta de entrega. Separé el trabajo en commits pequeños para que cada uno tuviera un único propósito y se pudiera revisar o revertir por separado.
 
 Finalmente abrí el pull request hacia el repositorio del curso, no hacia mi fork, completando la descripción con lo que cambié y cómo lo verifiqué.
 
