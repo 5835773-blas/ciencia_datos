@@ -26,7 +26,7 @@ def comision_esperada(precio, tasa):
 
 def resumen_por_marca(ventas, acumulado=None):
     """Suma el precio de venta por marca. Cada venta es un dict con 'car_make' y 'sale_price'."""
-    if acumulado is None: 
+    if acumulado is None:
         acumulado = {}
     for v in ventas:
         marca = v["car_make"]
@@ -39,6 +39,6 @@ def descripcion_venta(venta):
     mensaje = "Venta registrada"
     try:
         precio = float(venta["sale_price"])
-    except(KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError):
         precio = 0
     return mensaje + ": " + venta["car_make"] + " " + venta["car_model"] + " por $" + str(precio)
