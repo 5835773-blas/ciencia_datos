@@ -48,4 +48,4 @@ Aprendí que un linter no sirve solo para el estilo: una de sus advertencias se�
 
 ## Ayudas externas
 
-Usé Claude, un asistente de IA de Anthropic, para orientarme sobre los pasos de la tarea y redactar la redacción de este informe. Revisé y ejecuté todo el código entregado.
+Usé Claude, un asistente de IA de Anthropic, para orientarme sobre los pasos de la tarea y mejorar la redacción de este informe. Revisé y ejecuté todo el código entregado.
