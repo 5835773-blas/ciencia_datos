@@ -2,38 +2,31 @@
 
 ## Unidad U1: mi primer aporte reproducible
 
-**Nombre:** Fabio Alfonso
+**Nombre:** Fabio Cesar Alfonso Nuñez
 
 **Fecha:** 15 de octubre de 2026
 
 **Tag de cierre:** `u1-completa`
 
+---
+
+### Entorno
+Para el desarrollo de la unidad configuré un entorno reproducible basado en GitHub Codespaces a partir del fork del repositorio `curso-datos`. La utilización de un contenedor Dev Container garantizó paridad de dependencias del sistema y versiones de herramientas. Verifiqué la correcta inicialización ejecutando el script `python u1-entorno/tarea/verificar_entorno.py`, el cual comprobó la instalación del intérprete de Python, el formateador y linter Ruff, y el framework de pruebas Pytest, concluyendo de manera exitosa con el mensaje de estado `OK`.
+
+### Flujo de Git
+Implementé un flujo de control de versiones disciplinado siguiendo las directrices del curso. Creé la rama local `u1/fabioAlfonsoUNC` para aislar los cambios del historial principal. Registré el avance mediante commits atómicos y descriptivos en tiempo imperativo, documentando el propósito de cada cambio: preparación de la carpeta de entrega, correcciones de formato y estilo, solución del bug funcional y desarrollo de pruebas unitarias. Finalmente, generé el tag anotado `u1-completa` sobre el último commit y preparé el Pull Request dirigido al repositorio upstream del curso, asegurando tocar únicamente la ruta `entregas/fabioAlfonsoUNC/`.
+
 ### Que se hizo
-
-1. **Configuración del entorno:** Realicé el fork del repositorio `curso-datos` y levanté el entorno de desarrollo en un Codespace, validando las dependencias con `python u1-entorno/tarea/verificar_entorno.py` hasta obtener la salida `OK`.
-2. **Estructura y control de versiones:** Creé la rama de trabajo `u1/fabioAlfonsoUNC` y copié el archivo base a `entregas/fabioAlfonsoUNC/ejercicio.py`.
-3. **Refactorización y linter:** Utilicé `ruff` por primera vez en el proyecto para identificar violaciones de estilo y malas prácticas (`ruff check --fix` y `ruff format`), resolviendo manualmente las advertencias semánticas que el formateador no corrige por sí solo (corrección de nombres `CamelCase`, imports en desuso, excepciones desnudas y concatenaciones redundantes).
-4. **Corrección de bugs e implementación de pruebas:** Identifiqué y corregí un bug crítico de asignación en `resumen_por_marca`. Desarrollé el archivo `test_ejercicio.py` con una suite de pruebas en `pytest` que cubre tanto el flujo nominal como casos borde.
-5. **Cierre:** Commits atómicos documentando cada paso y preparación del pull request hacia el repositorio central del curso.
-
+Comencé copiando el archivo base `ejercicio.py` a mi directorio personal de entrega. A continuación, ejecuté `ruff check --fix` y `ruff format` para resolver automáticamente inconsistencias de estilo bajo lineamientos de PEP 8. Realicé correcciones manuales en imports no utilizados, funciones nombradas en CamelCase y captura de excepciones generales. Posteriormente, corregí el bug lógico en la función de acumulación de ventas y construí el archivo `test_ejercicio.py` con una suite de pruebas en Pytest que evalúa el camino feliz y casos de borde.
 
 ### Una decisión de diseño, explicada
+En la función `resumen_por_marca`, la firma original utilizaba un diccionario vacío como argumento por defecto (`acumulado={}`). En Python, las estructuras de datos mutables por defecto se instancian una sola vez al cargar la función. Decidí sustituirlo por el patrón centinela idiomático `acumulado=None`, incorporando la validación interna `if acumulado is None: acumulado = {}`. Esta decisión preserva la ergonomía de la función sin generar efectos colaterales indeseados.
 
-**Sustitución de argumento mutable por defecto en `resumen_por_marca`**
-
-El código original definía la función como `def resumen_por_marca(ventas, acumulado={}):`. En Python, los argumentos por defecto se evalúan una sola vez al cargar la definición de la función y no en cada invocación. Utilizar un objeto mutable (como un diccionario) provoca que múltiples llamadas sucesivas compartan la misma referencia en memoria, acumulando datos previos de forma residual (*state leakage*).
-
-Decidí reemplazar la firma por `acumulado=None` y agregar una guarda al inicio:
-
-```python
-if acumulado is None:
-    acumulado = {}
-```
 ### Un problema que apareció
-Al ser mi primera experiencia utilizando ruff, confié inicialmente en que cambiar la firma a acumulado=None para satisfacer la advertencia de argumento mutable era suficiente. Sin embargo, no me percaté de que el cuerpo de la función seguía asumiendo que acumulado era un diccionario indexable
+Al ser mi primera experiencia con Ruff, asumí inicialmente que cambiar la firma a `acumulado=None` bastaba para resolver la advertencia. Sin embargo, al invocar la función con el valor por defecto, falló con `TypeError: 'NoneType' object does not support item assignment` porque faltaba inicializar el diccionario dentro de la función. Además, `ruff format --check` reportó discrepancias debidas a caracteres invisibles y espacios no rompibles copiados al editar. Lo solucioné inicializando la variable, ejecutando el formateador directamente y escribiendo pruebas que verifican llamadas sucesivas independientes.
 
-#### Cómo se resolvió:
-Inicialicé explícitamente acumulado = {} dentro de la función cuando el argumento recibido es None.
+### Reflexión
+Esta unidad demostró que los linters estáticos no son simples verificadores de formato visual, sino herramientas críticas de inspección estática que detectan antipatrones donde suelen camuflarse errores funcionales reales. Con más tiempo, implementaría hooks de pre-commit automatizados para ejecutar Ruff y Pytest antes de registrar cada commit, además de parametrizar las pruebas unitarias para cubrir una gama más exhaustiva de datos malformados en fechas y descripciones.
 
-### USO DE IA
-Utilize ia para mejorar la redaccion de este informe y tambien para aprender el uso de ruff porque es la primera vez que lo utilizo
+### Ayudas externas
+Utilicé asistencia de inteligencia artificial como soporte de consulta técnica para interpretar las advertencias de Ruff, profundizar en el comportamiento de argumentos mutables en memoria, sugerir escenarios de prueba para casos de borde y estructurar la redacción técnica de este informe, validando y probando cada solución de manera manual en mi entorno.
