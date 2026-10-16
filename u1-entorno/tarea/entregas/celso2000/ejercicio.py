@@ -24,8 +24,10 @@ def comision_esperada(precio, tasa):
     return resultado
 
 
-def resumen_por_marca(ventas, acumulado={}):
+def resumen_por_marca(ventas, acumulado=None):
     """Suma el precio de venta por marca. Cada venta es un dict con 'car_make' y 'sale_price'."""
+    if acumulado is None:
+        acumulado = {}
     for v in ventas:
         marca = v["car_make"]
         acumulado[marca] = acumulado.get(marca, 0) + float(v["sale_price"])
