@@ -1,10 +1,8 @@
 # Ejercicio de la tarea U1: este archivo tiene errores de estilo A PROPÓSITO.
 # Cópialo a entregas/<tu-usuario>/ y corrígelo con ruff. Una de las advertencias
 # esconde un error real: tus pruebas deberían poder detectarlo.
-import os
 import re
-import sys
-from datetime import date, datetime
+from datetime import datetime
 
 
 def ParseFecha(texto):
@@ -32,7 +30,7 @@ def resumen_por_marca(ventas, acumulado={}):
 
 def descripcion_venta(venta):
     """Describe una venta en una línea."""
-    mensaje = f"Venta registrada"
+    mensaje = "Venta registrada"
     try:
         precio = float(venta["sale_price"])
     except:
