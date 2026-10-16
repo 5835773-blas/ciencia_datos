@@ -4,7 +4,7 @@
 
 **Fecha:** 2026-10-16
 
-**Tag de cierre:** Pendiente; todavía no he creado el tag.
+**Tag de cierre:** `u1-completa`
 
 ## Entorno
 
@@ -12,7 +12,7 @@ Realicé el trabajo dentro del Dev Container del repositorio, con Python 3.12.11
 
 ## Flujo de Git
 
-Creé la rama `u1/jirolk` a partir de `main` y organicé la entrega en `u1-entorno/tarea/entregas/jirolk`, separándola de los archivos originales de la tarea. En esa carpeta preparé la versión corregida de `ejercicio.py` y `test_ejercicio.py`. Verifiqué el estilo y el formato con Ruff, y las dos pruebas de pytest pasaron. Esta organización mantiene localizados los archivos de mi aporte para que puedan revisarse por separado.
+Creé la rama `u1/jirolk` a partir de `main` y organicé la entrega en `u1-entorno/tarea/entregas/jirolk`, separándola de los archivos originales de la tarea. Preparé la versión corregida de `ejercicio.py`, sus pruebas y el informe. La entrega queda organizada en cuatro commits: el primero corrige el ejercicio, el segundo agrega las pruebas, el tercero incorpora el informe y el cuarto actualiza este informe para dejar documentado el flujo completo. Verifiqué el estilo y el formato con Ruff, y las dos pruebas de pytest pasaron. El validador confirmó que los commits de la entrega y todos los cambios comparados con `origin/main` se limitan a mi carpeta.
 
 ## Un problema
 
@@ -24,5 +24,5 @@ Elegí probar dos llamadas independientes a `resumen_por_marca`, en lugar de lim
 
 ## Ayudas externas
 
-Usé GitHub Copilot como apoyo para interpretar la salida del verificador, entender los avisos de Ruff y revisar cómo plantear la prueba del acumulado. También recibí instrucciones para preparar este borrador del informe. Ejecuté las comprobaciones en el entorno local y revisé los cambios; la responsabilidad de comprender el código y completar los pasos pendientes de Git y del pull request sigue siendo mía.
+Usé GitHub Copilot como apoyo para interpretar la salida del verificador, entender los avisos de Ruff y revisar cómo plantear la prueba del acumulado. También recibí instrucciones para preparar este borrador del informe. Ejecuté las comprobaciones en el entorno local y revisé los cambios; la responsabilidad de comprender el código y revisar la entrega final sigue siendo mía.
 
