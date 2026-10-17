@@ -41,7 +41,7 @@ La prueba de llamadas indpendientes comprueba esta decisión: procesa Toyota y F
 
 La preparación inicial no incluyó un pre-commit, aunque el verificador lo exigía, una vez que se instaló de forma adicional, se pudo completar la comprobación, también sucedió una desconexión momentanea de Codespaces,lo que me generó ligera angústia por la posibilidad de perder lo poco que había aportado, pero luego la IA me mostró como comprobar que la rama seguía disponible y continué con la revisón del arhivo.
 
-### Aporte externo 
+### Ayudas externas 
 
 Pero Ruff apareció con cinco advertencias después del formato automático, la IA me indicó que realizara los cambios manuales, los identifiqué y lo hice, guardé el archivo y repetí la comprobación hasta que obtuve ALL CHECKS PASSED, luego pytest informó cuatro pruebas aprobadas con el resultado de 4 passed en 0.04 segundos, verificando el redondeo de comisión, la suma por marca, la lista vacía como caso borde y la independencia entre llamadas. 
 
