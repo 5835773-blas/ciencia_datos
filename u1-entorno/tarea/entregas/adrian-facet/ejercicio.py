@@ -43,7 +43,4 @@ def descripcion_venta(venta):
     except (KeyError, TypeError, ValueError):
         precio = 0
 
-    return (
-        f"{mensaje}: {venta['car_make']} {venta['car_model']} "
-        f"por ${precio}"
-    )
+    return f"{mensaje}: {venta['car_make']} {venta['car_model']} por ${precio}"
