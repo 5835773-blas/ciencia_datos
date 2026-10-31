@@ -20,8 +20,7 @@ def main() -> None:
         print(f"Total de posts cargados: {total}")
 
         filas = conexion.execute(
-            f"SELECT id, title FROM {ESQUEMA}.posts "
-            f"WHERE user_id = 1 ORDER BY id LIMIT 5"
+            f"SELECT id, title FROM {ESQUEMA}.posts WHERE user_id = 1 ORDER BY id LIMIT 5"
         ).fetchall()
         print("Primeros 5 posts del usuario 1:")
         for fila in filas:
