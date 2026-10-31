@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from pipeline import obtener_posts, posts
 
 POST_DE_EJEMPLO = {"id": 1, "title": "prueba", "body": "contenido", "userId": 1}
