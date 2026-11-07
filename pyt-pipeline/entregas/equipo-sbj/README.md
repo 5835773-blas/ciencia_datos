@@ -10,6 +10,8 @@ python pipeline.py
 
 # dbt
 dbt --project-dir dbt_project build
+dbt --project-dir dbt_project docs generate
+dbt --project-dir dbt_project docs serve
 
 # Orquestación
 dagster dev -f orchestration/definitions.py
