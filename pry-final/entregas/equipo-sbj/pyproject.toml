@@ -1,7 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "pipeline-minimercado"
 version = "1.0.0"
 description = "Pipeline analítico de un minimercado: dlt + DuckDB + dbt + Dagster"
+readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "dlt[duckdb]>=1.0",
@@ -11,3 +16,15 @@ dependencies = [
     "dagster>=1.8",
     "dagster-webserver>=1.8",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools]
+py-modules = ["generar_datos", "pipeline", "analisis"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["test_pipeline.py"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
