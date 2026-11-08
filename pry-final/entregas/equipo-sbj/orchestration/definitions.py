@@ -11,6 +11,7 @@ Ejecución:
     dagster asset materialize --select "*" -f orchestration/definitions.py
     dagster job execute -j pipeline_completo -f orchestration/definitions.py
 """
+
 from __future__ import annotations
 
 import sys
@@ -44,26 +45,37 @@ def generar_datos_asset() -> MaterializeResult:
     return MaterializeResult(metadata={t: MetadataValue.int(n) for t, n in resumen.items()})
 
 
-@asset(group_name=GRUPO, deps=[generar_datos_asset],
-       description="Carga idempotente de los CSV a DuckDB (esquema raw) con dlt.")
+@asset(
+    group_name=GRUPO,
+    deps=[generar_datos_asset],
+    description="Carga idempotente de los CSV a DuckDB (esquema raw) con dlt.",
+)
 def ingesta_dlt_asset() -> MaterializeResult:
     pipeline.ejecutar_ingesta()
     filas = pipeline.contar_filas()
     return MaterializeResult(metadata={t: MetadataValue.int(n) for t, n in filas.items()})
 
 
-@asset(group_name=GRUPO, deps=[ingesta_dlt_asset],
-       description="Ejecuta `dbt build`: construye staging/intermediate/marts y corre las pruebas.")
+@asset(
+    group_name=GRUPO,
+    deps=[ingesta_dlt_asset],
+    description="Ejecuta `dbt build`: construye staging/intermediate/marts y corre las pruebas.",
+)
 def dbt_transformations_asset() -> MaterializeResult:
     try:
         pipeline.ejecutar_dbt(comando="build")
     except RuntimeError as exc:
         raise Failure(description=str(exc)) from exc
-    return MaterializeResult(metadata={"comando": "dbt build", "proyecto": MetadataValue.path(str(pipeline.DBT_DIR))})
+    return MaterializeResult(
+        metadata={"comando": "dbt build", "proyecto": MetadataValue.path(str(pipeline.DBT_DIR))}
+    )
 
 
-@asset(group_name=GRUPO, deps=[dbt_transformations_asset],
-       description="Valida la salida final (volúmenes, duplicados, conciliaciones, stock, ABC).")
+@asset(
+    group_name=GRUPO,
+    deps=[dbt_transformations_asset],
+    description="Valida la salida final (volúmenes, duplicados, conciliaciones, stock, ABC).",
+)
 def reporte_calidad_asset() -> MaterializeResult:
     reporte = analisis.generar_reporte_calidad()
     ruta = analisis.escribir_reporte(reporte)
@@ -73,10 +85,12 @@ def reporte_calidad_asset() -> MaterializeResult:
             description=f"{len(fallidos)} validaciones de calidad fallaron",
             metadata={c["check"]: c["detalle"] for c in fallidos},
         )
-    return MaterializeResult(metadata={
-        "validaciones_ok": len(reporte["checks"]),
-        "reporte": MetadataValue.path(str(ruta)),
-    })
+    return MaterializeResult(
+        metadata={
+            "validaciones_ok": len(reporte["checks"]),
+            "reporte": MetadataValue.path(str(ruta)),
+        }
+    )
 
 
 pipeline_completo = define_asset_job(
@@ -86,6 +100,11 @@ pipeline_completo = define_asset_job(
 )
 
 defs = Definitions(
-    assets=[generar_datos_asset, ingesta_dlt_asset, dbt_transformations_asset, reporte_calidad_asset],
+    assets=[
+        generar_datos_asset,
+        ingesta_dlt_asset,
+        dbt_transformations_asset,
+        reporte_calidad_asset,
+    ],
     jobs=[pipeline_completo],
 )

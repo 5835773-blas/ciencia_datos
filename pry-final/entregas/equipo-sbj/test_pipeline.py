@@ -5,18 +5,18 @@
 
 Todas las pruebas trabajan en carpetas temporales: no tocan data/ ni data.duckdb.
 """
+
 from __future__ import annotations
 
 import hashlib
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-import duckdb
-import pytest
-
 import analisis
+import duckdb
 import generar_datos
 import pipeline
+import pytest
 
 TABLAS = ["productos", "vendedores", "compras", "ventas", "movimientos_stock"]
 
@@ -68,7 +68,9 @@ def test_stock_nunca_negativo_y_movimientos_cuadran_con_operaciones():
     d = generar_datos.generar()
     saldo: dict[int, int] = {}
     for m in d["movimientos_stock"]:
-        saldo[m["producto_id"]] = saldo.get(m["producto_id"], 0) + (m["cantidad"] if m["tipo"] == "entrada" else -m["cantidad"])
+        saldo[m["producto_id"]] = saldo.get(m["producto_id"], 0) + (
+            m["cantidad"] if m["tipo"] == "entrada" else -m["cantidad"]
+        )
         assert saldo[m["producto_id"]] >= 0
     entradas_compra = sum(m["cantidad"] for m in d["movimientos_stock"] if m["motivo"] == "compra")
     salidas_venta = sum(m["cantidad"] for m in d["movimientos_stock"] if m["motivo"] == "venta")
@@ -100,20 +102,57 @@ def test_esquema_duckdb_tras_ingesta(entorno):
     _ingestar(entorno)
     con = duckdb.connect(str(entorno["db"]), read_only=True)
     columnas = {
-        t: {c: tipo for c, tipo in con.execute(
-            "select column_name, data_type from information_schema.columns "
-            "where table_schema = 'raw' and table_name = ?", [t]).fetchall()}
+        t: {
+            c: tipo
+            for c, tipo in con.execute(
+                "select column_name, data_type from information_schema.columns "
+                "where table_schema = 'raw' and table_name = ?",
+                [t],
+            ).fetchall()
+        }
         for t in TABLAS
     }
-    assert set(columnas["ventas"]) >= {"id", "fecha", "producto_id", "cantidad", "precio_unitario", "descuento", "vendedor_id"}
-    assert set(columnas["productos"]) >= {"id", "nombre", "categoria", "costo_unitario", "precio_venta", "stock_inicial"}
+    assert set(columnas["ventas"]) >= {
+        "id",
+        "fecha",
+        "producto_id",
+        "cantidad",
+        "precio_unitario",
+        "descuento",
+        "vendedor_id",
+    }
+    assert set(columnas["productos"]) >= {
+        "id",
+        "nombre",
+        "categoria",
+        "costo_unitario",
+        "precio_venta",
+        "stock_inicial",
+    }
     assert set(columnas["vendedores"]) >= {"id", "nombre", "sucursal", "fecha_alta"}
-    assert set(columnas["compras"]) >= {"id", "fecha", "producto_id", "cantidad", "costo_unitario", "proveedor"}
-    assert set(columnas["movimientos_stock"]) >= {"id", "fecha", "producto_id", "tipo", "cantidad", "motivo", "referencia_id"}
+    assert set(columnas["compras"]) >= {
+        "id",
+        "fecha",
+        "producto_id",
+        "cantidad",
+        "costo_unitario",
+        "proveedor",
+    }
+    assert set(columnas["movimientos_stock"]) >= {
+        "id",
+        "fecha",
+        "producto_id",
+        "tipo",
+        "cantidad",
+        "motivo",
+        "referencia_id",
+    }
     assert columnas["ventas"]["fecha"] == "DATE"
     assert columnas["ventas"]["precio_unitario"] == "DOUBLE"
     assert columnas["ventas"]["cantidad"] == "BIGINT"
-    assert pipeline.contar_filas(entorno["db"]) == {t: len(generar_datos.generar()[t]) for t in TABLAS}
+    assert pipeline.contar_filas(entorno["db"]) == {
+        t: len(generar_datos.generar()[t]) for t in TABLAS
+    }
     con.close()
 
 
@@ -138,35 +177,67 @@ def test_e2e_generacion_ingesta_dbt_y_reporte(entorno):
     pipeline.ejecutar_dbt(entorno["db"], comando="build")  # incluye las pruebas de dbt
 
     con = duckdb.connect(str(entorno["db"]), read_only=True)
-    marts = {r[0] for r in con.execute(
-        "select table_name from information_schema.tables where table_schema = 'marts'").fetchall()}
-    assert marts == {"mart_ventas_diarias", "mart_rentabilidad_productos", "mart_rotacion_inventario",
-                     "mart_desempeno_vendedores", "mart_clasificacion_abc"}
+    marts = {
+        r[0]
+        for r in con.execute(
+            "select table_name from information_schema.tables where table_schema = 'marts'"
+        ).fetchall()
+    }
+    assert marts == {
+        "mart_ventas_diarias",
+        "mart_rentabilidad_productos",
+        "mart_rotacion_inventario",
+        "mart_desempeno_vendedores",
+        "mart_clasificacion_abc",
+    }
 
-    # Conciliación: facturación del mart == facturación recalculada en Python (Decimal) desde los datos origen
+    # Conciliación: facturación del mart == facturación recalculada en Python
+    # (Decimal) desde los datos origen
     neto_esperado = Decimal("0")
     for v in generar_datos.generar()["ventas"]:
-        bruto = (Decimal(str(v["cantidad"])) * Decimal(str(v["precio_unitario"]))).quantize(Decimal("0.01"), ROUND_HALF_UP)
+        bruto = (Decimal(str(v["cantidad"])) * Decimal(str(v["precio_unitario"]))).quantize(
+            Decimal("0.01"), ROUND_HALF_UP
+        )
         desc = (bruto * Decimal(str(v["descuento"]))).quantize(Decimal("0.01"), ROUND_HALF_UP)
         neto_esperado += bruto - desc
     neto_mart = con.execute("select sum(ingreso_neto) from marts.mart_ventas_diarias").fetchone()[0]
     assert Decimal(str(neto_mart)) == neto_esperado
 
     # Rentabilidad: ganancia = ingreso - costo, y los productos suman lo mismo que los días
-    assert con.execute("select count(*) from marts.mart_rentabilidad_productos "
-                       "where abs(ganancia_bruta - (ingreso_neto - costo_ventas)) > 0.01").fetchone()[0] == 0
-    g_prod = con.execute("select sum(ganancia_bruta) from marts.mart_rentabilidad_productos").fetchone()[0]
+    assert (
+        con.execute(
+            "select count(*) from marts.mart_rentabilidad_productos "
+            "where abs(ganancia_bruta - (ingreso_neto - costo_ventas)) > 0.01"
+        ).fetchone()[0]
+        == 0
+    )
+    g_prod = con.execute(
+        "select sum(ganancia_bruta) from marts.mart_rentabilidad_productos"
+    ).fetchone()[0]
     g_dia = con.execute("select sum(ganancia_bruta) from marts.mart_ventas_diarias").fetchone()[0]
     assert float(g_prod) == pytest.approx(float(g_dia), abs=0.01)
 
     # ABC: A + B + C = 20 productos, acumulado termina en 100 %
-    abc = dict(con.execute("select clasificacion_abc, count(*) from marts.mart_clasificacion_abc group by 1").fetchall())
+    abc = dict(
+        con.execute(
+            "select clasificacion_abc, count(*) from marts.mart_clasificacion_abc group by 1"
+        ).fetchall()
+    )
     assert sum(abc.values()) == 20 and {"A", "B", "C"} >= set(abc)
-    assert float(con.execute("select max(participacion_acumulada_pct) from marts.mart_clasificacion_abc").fetchone()[0]) == pytest.approx(100, abs=0.1)
+    assert float(
+        con.execute(
+            "select max(participacion_acumulada_pct) from marts.mart_clasificacion_abc"
+        ).fetchone()[0]
+    ) == pytest.approx(100, abs=0.1)
 
     # Vendedores: el ranking 1 es el de mayor ingreso
-    top = con.execute("select nombre_vendedor from marts.mart_desempeno_vendedores where ranking = 1").fetchone()[0]
-    mejor = con.execute("select nombre_vendedor from marts.mart_desempeno_vendedores order by ingreso_neto desc limit 1").fetchone()[0]
+    top = con.execute(
+        "select nombre_vendedor from marts.mart_desempeno_vendedores where ranking = 1"
+    ).fetchone()[0]
+    mejor = con.execute(
+        "select nombre_vendedor from marts.mart_desempeno_vendedores "
+        "order by ingreso_neto desc limit 1"
+    ).fetchone()[0]
     assert top == mejor
     con.close()
 
