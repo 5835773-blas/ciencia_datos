@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from decimal import Decimal
 from pathlib import Path
 
@@ -150,6 +151,11 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--db", type=Path, default=DB_PATH)
     ap.add_argument("--calidad", action="store_true", help="validar salida y escribir reporte JSON")
     args = ap.parse_args(argv)
+
+    # La consola de Windows puede usar cp1252 y no todos los caracteres (≈, ≥)
+    # son imprimibles: forzamos UTF-8 para que la impresión no truene.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     for nombre, (cols, filas) in ejecutar_consultas(args.db).items():
         _imprimir(nombre, cols, filas)
